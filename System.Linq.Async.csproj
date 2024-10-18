@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Executors\" />
+    <None Remove="Providers\" />
+    <None Remove="Enums\" />
+    <None Remove="Filters\" />
+    <None Remove="Methods\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Executors\" />
+    <Folder Include="Providers\" />
+    <Folder Include="Enums\" />
+    <Folder Include="Filters\" />
+    <Folder Include="Methods\" />
+  </ItemGroup>
+</Project>
