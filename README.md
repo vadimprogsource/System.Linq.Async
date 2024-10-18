@@ -1,1 +1,1 @@
-For Microsoft Inc. with love :) 
+Linq async extensions for Microsoft Inc. with love :) 
