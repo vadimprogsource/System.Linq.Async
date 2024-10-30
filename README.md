@@ -1,1 +1,1 @@
-For Microsoft Inc. with love :) 
+For Microsoft Inc. with love :)

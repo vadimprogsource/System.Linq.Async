@@ -21,7 +21,7 @@ public class OrderedProvider<T> : IOrderedProvider<T>
         return new Enumerable(this);
     }
 
-    public IAsyncOrderedEnumerable<T> CreateOrderByDesceling<TKey>(Func<T, TKey> keySelector)
+    public IAsyncOrderedEnumerable<T> CreateOrderByDescending<TKey>(Func<T, TKey> keySelector)
     {
         sorter.Add(new OrderByDescelingExecutor<T, TKey>(keySelector));
         return new Enumerable(this);
@@ -34,7 +34,7 @@ public class OrderedProvider<T> : IOrderedProvider<T>
         return new Enumerable(this);
     }
 
-    public IAsyncOrderedEnumerable<T> CreateThenByDesceling<TKey>(Func<T, TKey> keySelector)
+    public IAsyncOrderedEnumerable<T> CreateThenByDescending<TKey>(Func<T, TKey> keySelector)
     {
         sorter.Add(new OrderByDescelingExecutor<T, TKey>(keySelector));
         return new Enumerable(this);
