@@ -9,13 +9,14 @@ namespace System.Linq.Async
 
         public static IAsyncEnumerable<TResult> Select<TSource,TResult>(this IAsyncEnumerable<TSource> @this, Func<TSource, TResult> selector) => new Select<TSource,TResult>(@this, selector);
 
+        public static IAsyncEnumerable<TResult> OfType<TSource, TResult>(this IAsyncEnumerable<TSource> @this) => new OfType<TSource,TResult>(@this);
 
         public static IAsyncEnumerable<T> Where<T>(this IAsyncEnumerable<T> @this, Func<T, bool> predicate)=>new Where<T>(@this,predicate);
 
         public static IAsyncOrderedEnumerable<TSource> OrderBy<TSource, TKey>(this IAsyncEnumerable<TSource> @this, Func<TSource, TKey> keySelector) => new OrderBy<TSource,TKey>(@this,keySelector).AsOrderedEnumerable();
         public static IAsyncOrderedEnumerable<TSource> ThenBy<TSource, TKey>(this IAsyncOrderedEnumerable<TSource> @this, Func<TSource, TKey> keySelector) => @this.Provider.CreateThenBy(keySelector);
-        public static IAsyncOrderedEnumerable<TSource> OrderByDescending<TSource, TKey>(this IAsyncEnumerable<TSource> @this, Func<TSource, TKey> keySelector) => new OrderByDescending<TSource, TKey>(@this, keySelector).AsOrderedEnumerable();
-        public static IAsyncOrderedEnumerable<TSource> ThenByDescending<TSource, TKey>(this IAsyncOrderedEnumerable<TSource> @this, Func<TSource, TKey> keySelector) => @this.Provider.CreateThenByDescending(keySelector);
+        public static IAsyncOrderedEnumerable<TSource> OrderByDesceling<TSource, TKey>(this IAsyncEnumerable<TSource> @this, Func<TSource, TKey> keySelector) => new OrderByDesceling<TSource, TKey>(@this, keySelector).AsOrderedEnumerable();
+        public static IAsyncOrderedEnumerable<TSource> ThenByDesceling<TSource, TKey>(this IAsyncOrderedEnumerable<TSource> @this, Func<TSource, TKey> keySelector) => @this.Provider.CreateThenByDesceling(keySelector);
 
 
         public static IAsyncEnumerable<IGrouping<TKey, TSource>> GroupBy<TSource, TKey>(this IAsyncEnumerable<TSource> @this, Func<TSource, TKey> keySelector) => new GroupBy<TSource,TKey>(@this, keySelector);
