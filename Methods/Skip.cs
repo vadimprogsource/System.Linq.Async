@@ -1,37 +1,35 @@
-﻿using System;
-using System.Linq.Async.Enums;
+﻿using System.Linq.Async.Enums;
 
-namespace System.Linq.Async.Methods
+namespace System.Linq.Async.Methods;
+
+public class Skip<TSource>(IAsyncEnumerable<TSource> sources, int skipped) : AsyncEnumerableProxy<TSource>(sources)
 {
-    public class Skip<TSource>(IAsyncEnumerable<TSource> sources, int skipped) : AsyncEnumerableProxy<TSource>(sources)
+    protected override IAsyncEnumerator<TSource> CreateAsyncEnumerator(IAsyncEnumerator<TSource> enumerator) => new AsyncEnumerator(enumerator, skipped);
+    
+
+    private class AsyncEnumerator(IAsyncEnumerator<TSource> enumerator, int skipped)
+        : AsyncEnumeratorProxy<TSource>(enumerator)
     {
-        protected override IAsyncEnumerator<TSource> CreateAsyncEnumerator(IAsyncEnumerator<TSource> enumerator) => new AsyncEnumerator(enumerator, skipped);
-        
 
-        private class AsyncEnumerator(IAsyncEnumerator<TSource> enumerator, int skipped)
-            : AsyncEnumeratorProxy<TSource>(enumerator)
+        private  int skipped = skipped;
+
+
+        public async override ValueTask<bool> MoveNextAsync()
         {
-
-            private  int skipped = skipped;
-
-
-            public async override ValueTask<bool> MoveNextAsync()
+            while (skipped > 0)
             {
-                while (skipped > 0)
+                if (await base.MoveNextAsync())
                 {
-                    if (await base.MoveNextAsync())
-                    {
-                        --skipped;
-                        continue;
-                    }
-
-                    return false;
+                    --skipped;
+                    continue;
                 }
-                return await base.MoveNextAsync();
 
+                return false;
             }
+            return await base.MoveNextAsync();
 
         }
+
     }
 }
 

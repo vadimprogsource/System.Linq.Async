@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq.Async.Executors;
+﻿using System.Linq.Async.Executors;
 
 namespace System.Linq.Async.Methods;
 

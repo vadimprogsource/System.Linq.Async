@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq.Async.Enums;
+﻿using System.Linq.Async.Enums;
 
 namespace System.Linq.Async.Methods;
 

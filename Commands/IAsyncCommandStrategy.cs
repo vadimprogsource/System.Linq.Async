@@ -1,9 +1,8 @@
 ﻿using System;
-namespace System.Linq.Async.Commands
+namespace System.Linq.Async.Commands;
+
+public interface IAsyncCommandStrategy<T>
 {
-    public interface IAsyncCommandStrategy<T>
-    {
-        IAsyncCommand<T> CreateAsyncCommand(CommandBehavior commandBehavior);
-    }
+    IAsyncCommand<T> CreateAsyncCommand(CommandBehavior commandBehavior);
 }
 

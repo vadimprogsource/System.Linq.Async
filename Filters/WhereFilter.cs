@@ -1,38 +1,37 @@
 ﻿using System;
-namespace System.Linq.Async.Filters
+namespace System.Linq.Async.Filters;
+
+public class WhereFilter<TSource> 
 {
-    public class WhereFilter<TSource> 
+    private readonly List<Func<TSource, bool>> _where = new();
+
+    public void AndAlso(Func<TSource, bool> predicate) => _where.Add(predicate);
+
+    public bool Is(TSource source)
     {
-        private readonly List<Func<TSource, bool>> _where = new();
-
-        public void AndAlso(Func<TSource, bool> predicate) => _where.Add(predicate);
-
-        public bool Is(TSource source)
+        foreach (Func<TSource, bool> criteria in _where)
         {
-            foreach (Func<TSource, bool> criteria in _where)
-            {
-                if (criteria(source)) continue;
-                return false;
-            }
-
-            return true;
+            if (criteria(source)) continue;
+            return false;
         }
 
-        public IEnumerable<TSource> Apply(IEnumerable<TSource> sources)
+        return true;
+    }
+
+    public IEnumerable<TSource> Apply(IEnumerable<TSource> sources)
+    {
+        foreach (TSource source in sources)
         {
-            foreach (TSource source in sources)
-            {
-                if (Is(source)) yield return source;
-            }
+            if (Is(source)) yield return source;
         }
+    }
 
 
-        public async IAsyncEnumerable<TSource> Apply(IAsyncEnumerable<TSource> sources)
+    public async IAsyncEnumerable<TSource> Apply(IAsyncEnumerable<TSource> sources)
+    {
+        await foreach (TSource source in sources)
         {
-            await foreach (TSource source in sources)
-            {
-                if (Is(source)) yield return source;
-            }
+            if (Is(source)) yield return source;
         }
     }
 }

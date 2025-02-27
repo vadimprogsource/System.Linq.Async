@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq.Async.Commands;
+﻿using System.Linq.Async.Commands;
 using System.Linq.Expressions;
 
 namespace System.Linq.Async.Providers;

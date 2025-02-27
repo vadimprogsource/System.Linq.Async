@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq.Async.Providers;
+﻿using System.Linq.Async.Providers;
 
 namespace System.Linq.Async.Methods;
 
