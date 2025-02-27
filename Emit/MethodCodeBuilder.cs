@@ -6,34 +6,30 @@ namespace System.Linq.Async.Emit;
 public  class CodeDelegateBuilder :CodeBuilder  ,  IMethodCodeBuilder
 {
  
-    private readonly DynamicMethod method;
+    private readonly DynamicMethod _method;
 
 
-    public CodeDelegateBuilder(Type? ownerType, Type returnType, params Type[] argumentTypes)  : base()
+    protected CodeDelegateBuilder(Type? ownerType, Type returnType, params Type[] argumentTypes)  : base()
     {
         ownerType ??= typeof(void);
-        method = new($"{ownerType.Name}.{Guid.NewGuid():n}", returnType, argumentTypes ?? Array.Empty<Type>(), ownerType);
-        Generate(method.GetILGenerator());
+        _method = new($"{ownerType.Name}.{Guid.NewGuid():n}", returnType, argumentTypes ??[], ownerType);
+        Generate(_method.GetILGenerator());
     }
 
 
     public virtual Delegate BuildDelegate(Type methodType)
     {
         Build();
-        return method.CreateDelegate(methodType);
+        return _method.CreateDelegate(methodType);
     }
 
     public TDelegate BuildDelegate<TDelegate>() => BuildDelegate(typeof(TDelegate)) is TDelegate d ? d : throw new NotSupportedException();
 
 }
 
-public class CodeDelegateBuilder<TArgument, TResult> : CodeDelegateBuilder, IMethodCodeBuilder<TArgument, TResult>
+public class CodeDelegateBuilder<TArgument, TResult>(Type? ownerType = null)
+    : CodeDelegateBuilder(ownerType, typeof(TResult), typeof(TArgument)), IMethodCodeBuilder<TArgument, TResult>
 {
-    public CodeDelegateBuilder(Type? ownerType = null) : base(ownerType, typeof(TResult), typeof(TArgument))
-    {
-
-    }
-
     public Func<TArgument, TResult> BuildFunc() => BuildDelegate<Func<TArgument, TResult>>();
 }
 

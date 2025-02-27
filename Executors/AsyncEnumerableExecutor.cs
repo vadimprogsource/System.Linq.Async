@@ -1,30 +1,27 @@
 ﻿using System;
 namespace System.Linq.Async.Executors
 {
-    public abstract class AsyncEnumerableExecutor<TSource> 
+    public abstract class AsyncEnumerableExecutor<TSource>(
+        IAsyncEnumerable<TSource> sources,
+        CancellationToken cancellationToken = default)
     {
-        private readonly IAsyncEnumerator<TSource> handler;
+        private readonly IAsyncEnumerator<TSource> _handler = sources.GetAsyncEnumerator(cancellationToken);
 
-
-        public AsyncEnumerableExecutor(IAsyncEnumerable<TSource> sources,CancellationToken cancellationToken =default )
-        {
-            handler = sources.GetAsyncEnumerator(cancellationToken);
-        }
 
         public async Task ExecuteAsync()
         {
             try
             {
-                while (await handler.MoveNextAsync())
+                while (await _handler.MoveNextAsync())
                 {
-                    if (Do(handler.Current)) continue;
+                    if (Do(_handler.Current)) continue;
                     break;
                 }
                     
             }
             finally
             {
-                await handler.DisposeAsync();
+                await _handler.DisposeAsync();
             }
         }
 

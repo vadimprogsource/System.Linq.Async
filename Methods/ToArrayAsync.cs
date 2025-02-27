@@ -2,12 +2,9 @@
 
 namespace System.Linq.Async.Methods
 {
-    public class ToArrayAsync<TSource> : ToListAsync<TSource>
+    public class ToArrayAsync<TSource>(IAsyncEnumerable<TSource> sources, CancellationToken cancellationToken = default)
+        : ToListAsync<TSource>(sources, cancellationToken)
     {
-        public ToArrayAsync(IAsyncEnumerable<TSource> sources, CancellationToken cancellationToken = default) : base(sources, cancellationToken)
-        {
-        }
-
         public new  async Task<TSource[]> ExecuteAsync() => (await base.ExecuteAsync()).ToArray();
        
     }

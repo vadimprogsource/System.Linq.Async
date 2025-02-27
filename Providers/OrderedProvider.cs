@@ -4,72 +4,53 @@ using System.Linq.Async.Executors;
 
 namespace System.Linq.Async.Providers;
 
-public class OrderedProvider<T> : IOrderedProvider<T>
+public class OrderedProvider<T>(IAsyncEnumerable<T> chain) : IOrderedProvider<T>
 {
-    private readonly IAsyncEnumerable<T>     chain;
-    private readonly List<OrderExecutor<T>> sorter;
+    private readonly IAsyncEnumerable<T>     _chain = chain;
+    private readonly List<OrderExecutor<T>> _sorter = new();
 
-    public OrderedProvider(IAsyncEnumerable<T> chain)
+    protected IAsyncOrderedEnumerable<T> CreateOrderBy<TKey>(Func<T, TKey> keySelector)
     {
-        this.chain = chain;
-        sorter     = new();
-    }
-
-    public IAsyncOrderedEnumerable<T> CreateOrderBy<TKey>(Func<T, TKey> keySelector)
-    {
-        sorter.Add(new OrderByExecutor<T, TKey>(keySelector));
+        _sorter.Add(new OrderByExecutor<T, TKey>(keySelector));
         return new Enumerable(this);
     }
 
-    public IAsyncOrderedEnumerable<T> CreateOrderByDesceling<TKey>(Func<T, TKey> keySelector)
+    protected IAsyncOrderedEnumerable<T> CreateOrderByDesceling<TKey>(Func<T, TKey> keySelector)
     {
-        sorter.Add(new OrderByDescelingExecutor<T, TKey>(keySelector));
+        _sorter.Add(new OrderByDescelingExecutor<T, TKey>(keySelector));
         return new Enumerable(this);
 
     }
 
     public IAsyncOrderedEnumerable<T> CreateThenBy<TKey>(Func<T, TKey> keySelector)
     {
-        sorter.Add(new OrderByExecutor<T, TKey>(keySelector));
+        _sorter.Add(new OrderByExecutor<T, TKey>(keySelector));
         return new Enumerable(this);
     }
 
     public IAsyncOrderedEnumerable<T> CreateThenByDesceling<TKey>(Func<T, TKey> keySelector)
     {
-        sorter.Add(new OrderByDescelingExecutor<T, TKey>(keySelector));
+        _sorter.Add(new OrderByDescelingExecutor<T, TKey>(keySelector));
         return new Enumerable(this);
     }
 
     private IOrderedEnumerable<T> ExecuteOrder(IEnumerable<T> enumerable)
     {
-        return OrderExecutor<T>.ExecuteWith(enumerable, sorter);
+        return OrderExecutor<T>.ExecuteWith(enumerable, _sorter);
     }
 
 
-    private readonly struct Enumerable : IAsyncOrderedEnumerable<T>
+    private readonly struct Enumerable(OrderedProvider<T> provider) : IAsyncOrderedEnumerable<T>
     {
-        private readonly OrderedProvider<T> provider;
-
-        public Enumerable(OrderedProvider<T> provider)
-        {
-            this.provider = provider;
-        }
-
         public IOrderedProvider<T> Provider => provider;
 
-        public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default) => new Enumerator(provider, provider.chain.GetAsyncEnumerator(cancellationToken));
+        public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = default) => new Enumerator(provider, provider._chain.GetAsyncEnumerator(cancellationToken));
         
     }
 
-    private class Enumerator : AsyncEnumeratorExecutor<T,T>
+    private class Enumerator(OrderedProvider<T> provider, IAsyncEnumerator<T> enumerator)
+        : AsyncEnumeratorExecutor<T, T>(enumerator)
     {
-        private readonly OrderedProvider<T> provider;
-
-        public Enumerator(OrderedProvider<T> provider,IAsyncEnumerator<T> enumerator) : base(enumerator)
-        {
-            this.provider = provider;
-        }
-
         protected override IEnumerator<T> Execute(IEnumerable<T> sources)=> provider.ExecuteOrder(sources).GetEnumerator();
 
      

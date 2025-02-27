@@ -1,14 +1,11 @@
 ﻿using System;
 namespace System.Linq.Async.Executors
 {
-    public class OrderByDescelingExecutor<TSource, TKey> : OrderByExecutor<TSource, TKey>
+    public class OrderByDescelingExecutor<TSource, TKey>(Func<TSource, TKey> keySelector)
+        : OrderByExecutor<TSource, TKey>(keySelector)
     {
-        public OrderByDescelingExecutor(Func<TSource, TKey> keySelector) : base(keySelector)
-        {
-        }
-
-        public override IOrderedEnumerable<TSource> Execute(IEnumerable<TSource> sources) => sources.OrderByDescending(KeySelector);
-        public override IOrderedEnumerable<TSource> Execute(IOrderedEnumerable<TSource> sources) => sources.ThenByDescending(KeySelector);
+        protected override IOrderedEnumerable<TSource> Execute(IEnumerable<TSource> sources) => sources.OrderByDescending(KeySelector);
+        protected override IOrderedEnumerable<TSource> Execute(IOrderedEnumerable<TSource> sources) => sources.ThenByDescending(KeySelector);
         
     }
 }

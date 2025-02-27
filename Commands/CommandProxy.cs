@@ -4,21 +4,12 @@ using System.Linq.Expressions;
 
 namespace System.Linq.Async.Commands;
 
-internal readonly struct CommandProxy : IAsyncCommand
+internal readonly struct CommandProxy(IQueryProvider provider, Expression expression) : IAsyncCommand
 {
-    private readonly IQueryProvider _provider;
-    private readonly Expression    _expression;
-
-    public CommandProxy(IQueryProvider provider, Expression expression)
-    {
-        _provider = provider;
-        _expression = expression;
-    }
-
-    public int Execute() => _provider.Execute<int>(_expression);
-    public Task<TElement[]> ExecuteArrayAsync<TElement>(CancellationToken cancellationToken = default) => Task.FromResult(_provider.Execute<TElement[]>(_expression));
-    public Task<int> ExecuteAsync(CancellationToken cancellationToken = default) => Task.FromResult(_provider.Execute<int>(_expression));
-    public Task<bool> ExecuteExistsAsync(CancellationToken cancellationToken = default) => Task.FromResult(_provider.Execute<bool>(_expression));
-    public Task<TObject> ExecuteObjectAsync<TObject>(CancellationToken cancellationToken = default) => Task.FromResult(_provider.Execute<TObject>(_expression));
-    public Task<TValue> ExecuteValueAsync<TValue>(CancellationToken cancellationToken = default) => Task.FromResult(_provider.Execute<TValue>(_expression));
+    public int Execute() => provider.Execute<int>(expression);
+    public Task<TElement[]> ExecuteArrayAsync<TElement>(CancellationToken cancellationToken = default) => Task.FromResult(provider.Execute<TElement[]>(expression));
+    public Task<int> ExecuteAsync(CancellationToken cancellationToken = default) => Task.FromResult(provider.Execute<int>(expression));
+    public Task<bool> ExecuteExistsAsync(CancellationToken cancellationToken = default) => Task.FromResult(provider.Execute<bool>(expression));
+    public Task<TObject> ExecuteObjectAsync<TObject>(CancellationToken cancellationToken = default) => Task.FromResult(provider.Execute<TObject>(expression));
+    public Task<TValue> ExecuteValueAsync<TValue>(CancellationToken cancellationToken = default) => Task.FromResult(provider.Execute<TValue>(expression));
 }

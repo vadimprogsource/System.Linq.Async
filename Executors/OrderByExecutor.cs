@@ -2,18 +2,13 @@
 
 namespace System.Linq.Async.Executors
 {
-    public class OrderByExecutor<TSource,TKey>: OrderExecutor<TSource>
+    public class OrderByExecutor<TSource, TKey>(Func<TSource, TKey> keySelector) : OrderExecutor<TSource>
     {
-        protected readonly Func<TSource, TKey> KeySelector;
+        protected readonly Func<TSource, TKey> KeySelector = keySelector;
 
-        public OrderByExecutor(Func<TSource, TKey> keySelector)
-        {
-            KeySelector = keySelector;
-        }
+        protected override IOrderedEnumerable<TSource> Execute(IEnumerable<TSource> sources) => sources.OrderBy(KeySelector);
 
-        public override IOrderedEnumerable<TSource> Execute(IEnumerable<TSource> sources) => sources.OrderBy(KeySelector);
-
-        public override IOrderedEnumerable<TSource> Execute(IOrderedEnumerable<TSource> sources) => sources.ThenBy(KeySelector);
+        protected override IOrderedEnumerable<TSource> Execute(IOrderedEnumerable<TSource> sources) => sources.ThenBy(KeySelector);
         
     }
 

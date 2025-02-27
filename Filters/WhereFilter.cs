@@ -3,13 +3,13 @@ namespace System.Linq.Async.Filters
 {
     public class WhereFilter<TSource> 
     {
-        private readonly List<Func<TSource, bool>> where = new();
+        private readonly List<Func<TSource, bool>> _where = new();
 
-        public void AndAlso(Func<TSource, bool> predicate) => where.Add(predicate);
+        public void AndAlso(Func<TSource, bool> predicate) => _where.Add(predicate);
 
         public bool Is(TSource source)
         {
-            foreach (Func<TSource, bool> criteria in where)
+            foreach (Func<TSource, bool> criteria in _where)
             {
                 if (criteria(source)) continue;
                 return false;

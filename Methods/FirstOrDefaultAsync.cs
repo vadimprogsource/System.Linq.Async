@@ -4,15 +4,14 @@ using System.Linq.Expressions;
 
 namespace System.Linq.Async.Methods
 {
-    public class FirstOrDefaultAsync<TSource> : AsyncEnumerableExecutor<TSource>
+    public class FirstOrDefaultAsync<TSource>(
+        IAsyncEnumerable<TSource> sources,
+        Func<TSource, bool> predicate,
+        CancellationToken cancellationToken = default)
+        : AsyncEnumerableExecutor<TSource>(sources, cancellationToken)
     {
-        protected readonly Func<TSource, bool> Predicate;
-        protected TSource? Instance = default; 
-
-        public FirstOrDefaultAsync(IAsyncEnumerable<TSource> sources,Func<TSource,bool> predicate, CancellationToken cancellationToken = default) : base(sources, cancellationToken)
-        {
-            Predicate = predicate;
-        }
+        protected readonly Func<TSource, bool> Predicate = predicate;
+        protected TSource? Instance = default;
 
         protected override bool Do(TSource current)
         {

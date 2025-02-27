@@ -17,8 +17,8 @@ namespace System.Linq.Async.Executors
         }
 
 
-        public abstract IOrderedEnumerable<TSource> Execute(IEnumerable<TSource> sources);
-        public abstract IOrderedEnumerable<TSource> Execute(IOrderedEnumerable<TSource> sources);
+        protected abstract IOrderedEnumerable<TSource> Execute(IEnumerable<TSource> sources);
+        protected abstract IOrderedEnumerable<TSource> Execute(IOrderedEnumerable<TSource> sources);
     }
 }
 

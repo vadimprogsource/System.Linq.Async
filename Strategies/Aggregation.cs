@@ -9,13 +9,13 @@ namespace System.Linq.Async.Strategies;
 public static class Aggregation
 {
 
-    private static IMethod s_all_info              = new Method<IQueryable<object>>(x => x.All(y => true));
-    private static IMethod s_any_predicate         = new Method<IQueryable<object>>(x => x.Any(y => true));
-    private static  IMethod s_any                  = new Method<IQueryable<object>>(x => x.Any());
-    private static  IMethod s_count                = new Method<IQueryable<object>>(x => x.Count());
-    private static  IMethod s_count_predicate      = new Method<IQueryable<object>>(x => x.Count(y=>true));
-    private static  IMethod s_long_count           = new Method<IQueryable<object>>(x => x.LongCount());
-    private static  IMethod s_long_count_predicate = new Method<IQueryable<object>>(x => x.LongCount(y => true));
+    private static readonly IMethod s_all_info              = new Method<IQueryable<object>>(x => x.All(y => true));
+    private static readonly IMethod s_any_predicate         = new Method<IQueryable<object>>(x => x.Any(y => true));
+    private static readonly IMethod s_any                  = new Method<IQueryable<object>>(x => x.Any());
+    private static readonly IMethod s_count                = new Method<IQueryable<object>>(x => x.Count());
+    private static readonly IMethod s_count_predicate      = new Method<IQueryable<object>>(x => x.Count(y=>true));
+    private static readonly IMethod s_long_count           = new Method<IQueryable<object>>(x => x.LongCount());
+    private static readonly IMethod s_long_count_predicate = new Method<IQueryable<object>>(x => x.LongCount(y => true));
     private static readonly IMethod s_min          = new Method<IQueryable<object>>(x => x.Min(y => 1));
     private static readonly IMethod s_max          = new Method<IQueryable<object>>(x => x.Max(y => 1));
 

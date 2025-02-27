@@ -3,27 +3,16 @@ using System.Linq.Async.Enums;
 
 namespace System.Linq.Async.Methods
 {
-    public class SkipWhile<TSource> : AsyncEnumerableProxy<TSource>
+    public class SkipWhile<TSource>(IAsyncEnumerable<TSource> sources, Func<TSource, bool> predicate)
+        : AsyncEnumerableProxy<TSource>(sources)
     {
-        private readonly Func<TSource, bool> predicate;
-
-        public SkipWhile(IAsyncEnumerable<TSource> sources, Func<TSource, bool> predicate) : base(sources)
-        {
-            this.predicate = predicate;
-        }
-
-        public override IAsyncEnumerator<TSource> CreateAsyncEnumerator(IAsyncEnumerator<TSource> enumerator) => new AsyncEnumerator(enumerator, predicate); 
+        protected override IAsyncEnumerator<TSource> CreateAsyncEnumerator(IAsyncEnumerator<TSource> enumerator) => new AsyncEnumerator(enumerator, predicate); 
     
 
-        private class AsyncEnumerator : AsyncEnumeratorProxy<TSource>
+        private class AsyncEnumerator(IAsyncEnumerator<TSource> enumerator, Func<TSource, bool> predicate)
+            : AsyncEnumeratorProxy<TSource>(enumerator)
         {
-            private readonly Func<TSource, bool> predicate;
             private bool skipping = true;
-
-            public AsyncEnumerator(IAsyncEnumerator<TSource> enumerator, Func<TSource, bool> predicate) : base(enumerator)
-            {
-                this.predicate = predicate;
-            }
 
             public async override ValueTask<bool> MoveNextAsync()
             {

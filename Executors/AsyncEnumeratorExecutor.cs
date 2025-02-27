@@ -3,23 +3,18 @@ using System.Linq.Async.Enums;
 
 namespace System.Linq.Async.Executors;
 
-public abstract class AsyncEnumeratorExecutor<TSource,TResult> : IAsyncEnumerator<TResult>
+public abstract class AsyncEnumeratorExecutor<TSource, TResult>(IAsyncEnumerator<TSource> source)
+    : IAsyncEnumerator<TResult>
 {
-    private readonly IAsyncEnumerator<TSource> source; 
-    private IEnumerator<TResult>? executed = default;
+    private IEnumerator<TResult>? _executed = null;
 
 
-    public AsyncEnumeratorExecutor(IAsyncEnumerator<TSource> source) 
-    {
-        this.source = source;
-    }
-
-    public  TResult Current=>(executed ?? throw new NullReferenceException()).Current;
+    public  TResult Current=>(_executed ?? throw new NullReferenceException()).Current;
         
 
     public  ValueTask DisposeAsync()
     {
-        if (executed is IDisposable disp) disp.Dispose();
+        if (_executed is IDisposable disp) disp.Dispose();
         return ValueTask.CompletedTask;
     }
 
@@ -28,7 +23,7 @@ public abstract class AsyncEnumeratorExecutor<TSource,TResult> : IAsyncEnumerato
 
     public async  ValueTask<bool> MoveNextAsync()
     {
-        if (executed == null)
+        if (_executed == null)
         {
             List<TSource> list = new();
             try
@@ -40,10 +35,10 @@ public abstract class AsyncEnumeratorExecutor<TSource,TResult> : IAsyncEnumerato
                 await source.DisposeAsync();
             }
 
-            executed = Execute(list);
+            _executed = Execute(list);
         }
 
-        return executed.MoveNext();
+        return _executed.MoveNext();
 
     }
 }

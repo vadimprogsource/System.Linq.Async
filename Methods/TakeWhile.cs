@@ -5,16 +5,16 @@ namespace System.Linq.Async.Methods
 {
     public class TakeWhile<TSource> : AsyncEnumerableProxy<TSource>
     {
-        private readonly IPredicateExecutor executor;
+        private readonly IPredicateExecutor _executor;
 
         public TakeWhile(IAsyncEnumerable<TSource> sources,Func<TSource,bool> predicate) : base(sources)
         {
-            executor = new PredicateExecutor(predicate);
+            _executor = new PredicateExecutor(predicate);
         }
 
         public TakeWhile(IAsyncEnumerable<TSource> sources, Func<TSource,int, bool> predicate) : base(sources)
         {
-            executor = new PredicateExecutorWithIndex(predicate);
+            _executor = new PredicateExecutorWithIndex(predicate);
 
         }
 
@@ -23,53 +23,32 @@ namespace System.Linq.Async.Methods
             bool Execute(TSource source,int index);
         }
 
-        private readonly struct PredicateExecutor : IPredicateExecutor
+        private readonly struct PredicateExecutor(Func<TSource, bool> predicate) : IPredicateExecutor
         {
-            private readonly Func<TSource, bool> predicate;
-
-            public PredicateExecutor(Func<TSource, bool> predicate)
-            {
-                this.predicate = predicate;
-            }
-
             public bool Execute(TSource source, int index) => predicate(source);
             
         }
 
-        private readonly struct PredicateExecutorWithIndex : IPredicateExecutor
+        private readonly struct PredicateExecutorWithIndex(Func<TSource, int, bool> predicate) : IPredicateExecutor
         {
-            private readonly Func<TSource,int, bool> predicate;
-
-            public PredicateExecutorWithIndex(Func<TSource,int, bool> predicate)
-            {
-                this.predicate = predicate;
-            }
-
             public bool Execute(TSource source, int index) => predicate(source, index);
             
         }
 
 
-
-        public override IAsyncEnumerator<TSource> CreateAsyncEnumerator(IAsyncEnumerator<TSource> enumerator) => new AsyncEnumerator(enumerator, executor);
+        protected override IAsyncEnumerator<TSource> CreateAsyncEnumerator(IAsyncEnumerator<TSource> enumerator) => new AsyncEnumerator(enumerator, _executor);
         
 
-        private class AsyncEnumerator : AsyncEnumeratorProxy<TSource>
+        private class AsyncEnumerator(IAsyncEnumerator<TSource> enumerator, IPredicateExecutor executor)
+            : AsyncEnumeratorProxy<TSource>(enumerator)
         {
-            private readonly IPredicateExecutor executor;
-            private int index;
+            private int _index = 0;
 
-            public AsyncEnumerator(IAsyncEnumerator<TSource> enumerator,IPredicateExecutor executor) : base(enumerator)
-            {
-                this.executor = executor;
-                index = 0;
-            }
-
-            public async override ValueTask<bool> MoveNextAsync()
+            public override async ValueTask<bool> MoveNextAsync()
             {
                 if(await base.MoveNextAsync())
                 {
-                    return executor.Execute(Current,index++);
+                    return executor.Execute(Current,_index++);
                 }
                 return false;
             }

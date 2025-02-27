@@ -4,46 +4,35 @@ using System.Linq.Async.Enums;
 
 namespace System.Linq.Async.Methods
 {
-    public class TakeLast<TSource> : AsyncEnumerableProxy<TSource>
+    public class TakeLast<TSource>(IAsyncEnumerable<TSource> sources, int taken)
+        : AsyncEnumerableProxy<TSource>(sources)
     {
-        private readonly int taken;
-
-        public TakeLast(IAsyncEnumerable<TSource> sources,int taken) : base(sources)
-        {
-            this.taken = taken;
-        }
-
-        public override IAsyncEnumerator<TSource> CreateAsyncEnumerator(IAsyncEnumerator<TSource> enumerator) => new AsyncEnumerator(enumerator, taken);
+        protected override IAsyncEnumerator<TSource> CreateAsyncEnumerator(IAsyncEnumerator<TSource> enumerator) => new AsyncEnumerator(enumerator, taken);
        
-        private class AsyncEnumerator : AsyncEnumeratorProxy<TSource>
+        private class AsyncEnumerator(IAsyncEnumerator<TSource> enumerator, int taken)
+            : AsyncEnumeratorProxy<TSource>(enumerator)
         {
-            private readonly int taken;
-            private Queue<TSource>? queue;
-            private TSource? current;
+            private Queue<TSource>? _queue;
+            private TSource? _current;
 
-            public AsyncEnumerator(IAsyncEnumerator<TSource> enumerator,int taken) : base(enumerator)
-            {
-                this.taken = taken;
-            }
-
-            public override TSource Current => current ?? throw new NullReferenceException();
+            public override TSource Current => _current ?? throw new NullReferenceException();
 
             public override async ValueTask<bool> MoveNextAsync()
             {
-                if (queue == null)
+                if (_queue == null)
                 {
-                    queue = new();
+                    _queue = new();
 
                     try
                     {
                         while (await base.MoveNextAsync())
                         {
-                            if (queue.Count >= taken)
+                            if (_queue.Count >= taken)
                             {
-                                queue.Dequeue();
+                                _queue.Dequeue();
                             }
 
-                            queue.Enqueue(base.Current);
+                            _queue.Enqueue(base.Current);
                         }
                     }
                     finally
@@ -52,9 +41,9 @@ namespace System.Linq.Async.Methods
                     }
                 }
 
-                if (queue.Count > 0)
+                if (_queue.Count > 0)
                 {
-                    current = queue.Dequeue();
+                    _current = _queue.Dequeue();
                     return true;
                 }
 

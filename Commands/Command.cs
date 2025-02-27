@@ -2,19 +2,11 @@
 namespace System.Linq.Async.Commands;
 
 
-public readonly struct AsyncCommand<T> : IAsyncCommand<T>
+public readonly struct AsyncCommand<T>(Func<T, Task> exec) : IAsyncCommand<T>
 {
-    private readonly Func<T, Task> command_action;
-
-
-    public AsyncCommand(Func<T, Task> exec)
-    {
-        command_action = exec;
-    }
-
     public async Task<T> ExecuteAsync(T obj)
     {
-        await command_action(obj);
+        await exec(obj);
         return obj;
     }
 }

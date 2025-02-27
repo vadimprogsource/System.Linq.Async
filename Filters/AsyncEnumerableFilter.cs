@@ -3,29 +3,17 @@ using System.Linq.Async.Enums;
 
 namespace System.Linq.Async.Filters
 {
-    public class AsyncEnumerableFilter<TSource> : AsyncEnumerableProxy<TSource>
+    public class AsyncEnumerableFilter<TSource>(IAsyncEnumerable<TSource> sources, Func<TSource, bool> predicate)
+        : AsyncEnumerableProxy<TSource>(sources)
     {
-        private readonly Func<TSource, bool> predicate;
-
-        public AsyncEnumerableFilter(IAsyncEnumerable<TSource> sources, Func<TSource, bool> predicate) : base(sources)
-        {
-            this.predicate = predicate;
-        }
-
-        public override IAsyncEnumerator<TSource> CreateAsyncEnumerator(IAsyncEnumerator<TSource> enumerator) => new Enumerator(enumerator, predicate);
+        protected override IAsyncEnumerator<TSource> CreateAsyncEnumerator(IAsyncEnumerator<TSource> enumerator) => new Enumerator(enumerator, predicate);
         
 
 
-        private class Enumerator : AsyncEnumeratorProxy<TSource>
+        private class Enumerator(IAsyncEnumerator<TSource> enumerator, Func<TSource, bool> predicate)
+            : AsyncEnumeratorProxy<TSource>(enumerator)
         {
-            private readonly Func<TSource, bool> predicate;
-
-            public Enumerator(IAsyncEnumerator<TSource> enumerator, Func<TSource, bool> predicate) : base(enumerator)
-            {
-                this.predicate = predicate;
-            }
-
-            public async override ValueTask<bool> MoveNextAsync()
+            public override async ValueTask<bool> MoveNextAsync()
             {
                 while (await base.MoveNextAsync())
                 {

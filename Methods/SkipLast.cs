@@ -3,28 +3,17 @@ using System.Linq.Async.Enums;
 
 namespace System.Linq.Async.Methods
 {
-    public class SkipLast<TSource> : AsyncEnumerableProxy<TSource>
+    public class SkipLast<TSource>(IAsyncEnumerable<TSource> sources, int skipped)
+        : AsyncEnumerableProxy<TSource>(sources)
     {
-        private readonly int skipped;
-
-        public SkipLast(IAsyncEnumerable<TSource> sources,int skipped) : base(sources)
-        {
-            this.skipped = skipped;
-        }
-
-        public override IAsyncEnumerator<TSource> CreateAsyncEnumerator(IAsyncEnumerator<TSource> enumerator) => new AsyncEnumerator(enumerator, skipped);
+        protected override IAsyncEnumerator<TSource> CreateAsyncEnumerator(IAsyncEnumerator<TSource> enumerator) => new AsyncEnumerator(enumerator, skipped);
        
 
-        private class AsyncEnumerator : AsyncEnumeratorProxy<TSource>
+        private class AsyncEnumerator(IAsyncEnumerator<TSource> enumerator, int skipped)
+            : AsyncEnumeratorProxy<TSource>(enumerator)
         {
-            private readonly int skipped;
             private readonly Queue<TSource> queue = new();
             private TSource? current = default;
-
-            public AsyncEnumerator(IAsyncEnumerator<TSource> enumerator,int skipped) : base(enumerator)
-            {
-                this.skipped = skipped;
-            }
 
             public override TSource Current=> current?? throw new NullReferenceException();
                 

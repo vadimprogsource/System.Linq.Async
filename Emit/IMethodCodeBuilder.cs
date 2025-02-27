@@ -13,7 +13,7 @@ public interface IMethodCodeBuilder : ICodeBuilder
 }
 
 
-public interface IMethodCodeBuilder<TArgument, TResult> : IMethodCodeBuilder
+public interface IMethodCodeBuilder<in TArgument, out TResult> : IMethodCodeBuilder
 {
     Func<TArgument, TResult> BuildFunc();
 }

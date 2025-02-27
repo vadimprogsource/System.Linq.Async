@@ -25,15 +25,15 @@ public class Method : IMethod
 
     public MethodInfo GetMethodInfo()
     {
-        return method_info;
+        return _methodInfo;
     }
 
 
-    private MethodInfo method_info;
+    private MethodInfo _methodInfo;
 
     public Method(MethodInfo methodInfo)
     {
-        method_info = GetKeyMethod(methodInfo);
+        _methodInfo = GetKeyMethod(methodInfo);
     }
 
 
@@ -46,17 +46,17 @@ public class Method : IMethod
 
         if (obj is Method m)
         {
-            return m.method_info == method_info;
+            return m._methodInfo == _methodInfo;
         }
 
         if (obj is MethodCallExpression expr)
         {
-            return method_info == GetKeyMethod((expr).Method);
+            return _methodInfo == GetKeyMethod((expr).Method);
         }
 
         if (obj is MethodInfo mi)
         {
-            return method_info == GetKeyMethod(mi);
+            return _methodInfo == GetKeyMethod(mi);
         }
 
         return false;
@@ -65,12 +65,12 @@ public class Method : IMethod
     public bool Is(MethodCallExpression methodCall)
     {
 
-        if (method_info.IsGenericMethodDefinition)
+        if (_methodInfo.IsGenericMethodDefinition)
         {
-            return method_info == GetKeyMethod(methodCall.Method);
+            return _methodInfo == GetKeyMethod(methodCall.Method);
         }
 
-        return method_info == methodCall.Method || method_info.Name == methodCall.Method.Name;
+        return _methodInfo == methodCall.Method || _methodInfo.Name == methodCall.Method.Name;
 
     }
 
@@ -78,69 +78,68 @@ public class Method : IMethod
 
     public override int GetHashCode()
     {
-        return typeof(Method).GetHashCode() ^ method_info.GetHashCode();
+        return typeof(Method).GetHashCode() ^ _methodInfo.GetHashCode();
     }
 
 
     public Expression Call<T>(Expression operand)
     {
-        return Expression.Call(method_info.MakeGenericMethod(typeof(T)), operand);
+        return Expression.Call(_methodInfo.MakeGenericMethod(typeof(T)), operand);
     }
 
     public Expression Call<T>(Expression left, LambdaExpression right)
     {
-        return Expression.Call(method_info.MakeGenericMethod(typeof(T)), left, Expression.Quote(right));
+        return Expression.Call(_methodInfo.MakeGenericMethod(typeof(T)), left, Expression.Quote(right));
     }
 
     public Expression Call<T>(Expression left, ConstantExpression right)
     {
-        return Expression.Call(method_info.MakeGenericMethod(typeof(T)), left, right);
+        return Expression.Call(_methodInfo.MakeGenericMethod(typeof(T)), left, right);
     }
 
     public Expression Call<T, V>(Expression left, LambdaExpression right)
     {
-        return Expression.Call(method_info.MakeGenericMethod(typeof(T), typeof(V)), left, Expression.Quote(right));
+        return Expression.Call(_methodInfo.MakeGenericMethod(typeof(T), typeof(V)), left, Expression.Quote(right));
     }
 
 
     public Expression Call<T, V>(Expression @this, LambdaExpression left, LambdaExpression right)
     {
-        return Expression.Call(method_info.MakeGenericMethod(typeof(T), typeof(V)), @this, Expression.Quote(left), Expression.Quote(right));
+        return Expression.Call(_methodInfo.MakeGenericMethod(typeof(T), typeof(V)), @this, Expression.Quote(left), Expression.Quote(right));
     }
 
 
     public Expression EmitCall(Expression left, LambdaExpression right)
     {
-        if (method_info.IsGenericMethodDefinition)
+        if (_methodInfo.IsGenericMethodDefinition)
         {
-            return Expression.Call(method_info.MakeGenericMethod(left.Type, right.ReturnType), left, Expression.Quote(right));
+            return Expression.Call(_methodInfo.MakeGenericMethod(left.Type, right.ReturnType), left, Expression.Quote(right));
         }
 
-        return Expression.Call(method_info, left, Expression.Quote(right));
+        return Expression.Call(_methodInfo, left, Expression.Quote(right));
     }
 
 
     public Expression EmitCall(Expression operand)
     {
-        if (method_info.IsGenericMethodDefinition)
+        if (_methodInfo.IsGenericMethodDefinition)
         {
-            return Expression.Call(method_info.MakeGenericMethod(operand.Type), operand);
+            return Expression.Call(_methodInfo.MakeGenericMethod(operand.Type), operand);
         }
 
-        return Expression.Call(method_info, operand);
+        return Expression.Call(_methodInfo, operand);
     }
 
     public MethodInfo GetBaseMethod()
     {
-        return GetKeyMethod(method_info);
+        return GetKeyMethod(_methodInfo);
     }
 
-    public MethodInfo MakeGenericMethod(params Type[] type) => method_info.MakeGenericMethod(type);
+    public MethodInfo MakeGenericMethod(params Type[] type) => _methodInfo.MakeGenericMethod(type);
 
 }
 
-public class Method<T> : Method
-{
-    public Method(Expression<Action<T>> methodCall) : base((methodCall.Body is MethodCallExpression call)?call.Method:throw new NotSupportedException()) { }
-}
+public class Method<T>(Expression<Action<T>> methodCall) : Method((methodCall.Body is MethodCallExpression call)
+    ? call.Method
+    : throw new NotSupportedException());
 

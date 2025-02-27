@@ -3,32 +3,21 @@ using System.Linq.Async.Enums;
 
 namespace System.Linq.Async.Methods;
 
-public class Take<TSource> : AsyncEnumerableProxy<TSource>
+public class Take<TSource>(IAsyncEnumerable<TSource> sources, int taken) : AsyncEnumerableProxy<TSource>(sources)
 {
-    private readonly int taken;
-
-    public Take(IAsyncEnumerable<TSource> sources,int taken) : base(sources)
-    {
-        this.taken = taken;
-    }
-
-    public override IAsyncEnumerator<TSource> CreateAsyncEnumerator(IAsyncEnumerator<TSource> enumerator) => new AsyncEnumerator(enumerator, taken);
+    protected override IAsyncEnumerator<TSource> CreateAsyncEnumerator(IAsyncEnumerator<TSource> enumerator) => new AsyncEnumerator(enumerator, taken);
     
 
-    private class AsyncEnumerator : AsyncEnumeratorProxy<TSource>
+    private class AsyncEnumerator(IAsyncEnumerator<TSource> enumerator, int taken)
+        : AsyncEnumeratorProxy<TSource>(enumerator)
     {
-        private int taken;
-
-        public AsyncEnumerator(IAsyncEnumerator<TSource> enumerator,int taken) : base(enumerator)
-        {
-            this.taken = taken;
-        }
+        private int _taken = taken;
 
         public override async ValueTask<bool> MoveNextAsync()
         {
-            if (taken > 0)
+            if (_taken > 0)
             {
-                --taken;
+                --_taken;
                 return await base.MoveNextAsync();
             }
 
