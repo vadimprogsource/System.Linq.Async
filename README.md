@@ -1,5 +1,5 @@
 Linq async extensions for Microsoft Inc. with love :) 
-.Net 8
+.Net 9
 
 Example:
 
